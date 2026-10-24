@@ -158,7 +158,7 @@ class _AuthScreenState extends State<AuthScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
               child: Form(
@@ -167,39 +167,124 @@ class _AuthScreenState extends State<AuthScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      width: 76,
-                      height: 76,
+                      height: 166,
+                      padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(22),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF142B4A), Color(0xFF2864E8)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(26),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFF2864E8).withValues(alpha: .17),
+                            blurRadius: 24,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.local_shipping,
-                        color: Colors.white,
-                        size: 42,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: -3,
+                            bottom: -12,
+                            child: Icon(
+                              Icons.local_shipping_rounded,
+                              size: 120,
+                              color: Colors.white.withValues(alpha: .09),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: 43,
+                                height: 43,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: .16),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: const Icon(
+                                  Icons.local_shipping_rounded,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              const Spacer(),
+                              const Text(
+                                'HAULMATE',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: .6,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Freight, in motion.',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: .75),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 240),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, .08),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      ),
+                      child: Column(
+                        key: ValueKey('$_otpRequired-$_register'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _otpRequired
+                                ? 'Verify your mobile number'
+                                : _register
+                                    ? 'Create your account'
+                                    : 'Truck Booking',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -.4,
+                                ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            _otpRequired
+                                ? 'Enter the six-digit code sent to ${_phone.text.trim()}.'
+                                : _register
+                                    ? 'Join the transport marketplace.'
+                                    : 'Book trucks and manage freight in one place.',
+                            style: const TextStyle(
+                              color: Color(0xFF7A8799),
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Text(
-                      _otpRequired
-                          ? 'Verify your mobile number'
-                          : _register
-                              ? 'Create your account'
-                              : 'Truck Booking',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _otpRequired
-                          ? 'Enter the six-digit code sent to ${_phone.text.trim()}.'
-                          : _register
-                              ? 'Join the transport marketplace.'
-                              : 'Book trucks and manage freight in one place.',
-                    ),
-                    const SizedBox(height: 28),
                     if (_otpRequired) ...[
                       TextFormField(
                         controller: _otp,

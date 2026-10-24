@@ -77,20 +77,6 @@ Copy the backend example file to a private `.env` from the repository root:
 Copy-Item backend\.env.example backend\.env
 ```
 
-Keep `backend/.env` private. Configure rotated provider credentials there, not
-in Flutter, source code, or this README:
-
-- `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` enable Razorpay checkout. Rotate
-  any credentials previously pasted into chats or other shared locations.
-- `GOOGLE_MAPS_API_KEY` enables the server-side Google Routes estimate endpoint.
-  Enable the Routes API and billing/restrictions in the Google Cloud project.
-- `DATABASE_URL` and `REDIS_URL` are for separately managed PostgreSQL and Redis
-  deployments; they are not configured for this local setup.
-
-Razorpay checkout is currently available on Android and iOS. Use test keys for
-testing. The secret remains on the backend. Do not enable live payments until
-HTTPS, production database/services, and the Razorpay account are configured.
-
 ## Proposal scope and current limitations
 
 The Django and Flutter code implements the core marketplace workflows. Some

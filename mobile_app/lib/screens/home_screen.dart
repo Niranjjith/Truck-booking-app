@@ -22,8 +22,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   int _tab = 0;
+  late final AnimationController _tabAnimation = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 260),
+  )..value = 1;
   late Future<List<dynamic>> _loads;
   late Future<List<dynamic>> _myLoads;
   late Future<List<dynamic>> _trucks;
@@ -33,6 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _refresh();
+  }
+
+  @override
+  void dispose() {
+    _tabAnimation.dispose();
+    super.dispose();
+  }
+
+  void _selectTab(int index) {
+    if (_tab == index) return;
+    setState(() => _tab = index);
+    _tabAnimation.forward(from: 0);
   }
 
   void _refresh() {
@@ -300,13 +317,30 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ],
       ),
-      body: IndexedStack(index: _tab, children: [
-        _dashboard(),
-        _loadsView(),
-        _trucksView(),
-        BookingsScreen(api: widget.api),
-        PaymentsScreen(api: widget.api),
-      ]),
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _tabAnimation,
+          curve: Curves.easeOutCubic,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, .018),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: _tabAnimation,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+          child: IndexedStack(index: _tab, children: [
+            _dashboard(),
+            _loadsView(),
+            _trucksView(),
+            BookingsScreen(api: widget.api),
+            PaymentsScreen(api: widget.api),
+          ]),
+        ),
+      ),
       floatingActionButton: _tab == 1 || _tab == 2
           ? FutureBuilder<Map<String, dynamic>>(
               future: _user,
@@ -333,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
         surfaceTintColor: Colors.white,
         elevation: 8,
         selectedIndex: _tab,
-        onDestinationSelected: (v) => setState(() => _tab = v),
+        onDestinationSelected: _selectTab,
         indicatorColor: const Color(0xFFE8EFFF),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: const [
@@ -420,10 +454,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 18),
                         Row(children: [
                           _heroButton('Explore loads', Icons.search_rounded,
-                              () => setState(() => _tab = 1)),
+                              () => _selectTab(1)),
                           const SizedBox(width: 10),
                           _heroButton('Add a truck', Icons.add_road_rounded,
-                              () => setState(() => _tab = 2)),
+                              () => _selectTab(2)),
                         ])
                       ])
                 ])),
@@ -469,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icons.inventory_2_rounded,
                                     const Color(0xFFEAF0FF),
                                     _blue,
-                                    () => setState(() => _tab = 1)),
+                                    () => _selectTab(1)),
                                 _statCard(
                                     'Registered trucks',
                                     t.connectionState == ConnectionState.waiting
@@ -478,7 +512,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icons.local_shipping_rounded,
                                     const Color(0xFFE6F7F1),
                                     const Color(0xFF128568),
-                                    () => setState(() => _tab = 2)),
+                                    () => _selectTab(2)),
                                 _statCard(
                                     'Bookings',
                                     b.connectionState == ConnectionState.waiting
@@ -487,7 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icons.receipt_long_rounded,
                                     const Color(0xFFFFF2DF),
                                     const Color(0xFFCA7B10),
-                                    () => setState(() => _tab = 3)),
+                                    () => _selectTab(3)),
                                 _statCard(
                                     'Quick support',
                                     'Get help',
@@ -506,7 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 18,
                           fontWeight: FontWeight.w800))),
               TextButton(
-                  onPressed: () => setState(() => _tab = 1),
+                  onPressed: () => _selectTab(1),
                   child: const Text('View loads'))
             ]),
             const SizedBox(height: 8),
@@ -516,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Share pickup, destination and freight details',
                 const Color(0xFFEAF0FF),
                 _blue, () async {
-              setState(() => _tab = 1);
+              _selectTab(1);
               await Future.delayed(const Duration(milliseconds: 100));
               if (mounted) _create();
             }),
@@ -527,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Add vehicle details and capacity',
                 const Color(0xFFE6F7F1),
                 const Color(0xFF128568), () async {
-              setState(() => _tab = 2);
+              _selectTab(2);
               await Future.delayed(const Duration(milliseconds: 100));
               if (mounted) _create();
             }),
