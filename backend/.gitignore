@@ -1,0 +1,10 @@
+node_modules/
+.env
+npm-debug.log*
+.DS_Store
+coverage/
+django_api/__pycache__/
+django_api/**/__pycache__/
+django_api/local.sqlite3
+django_api/.venv/
+django_api/staticfiles/
